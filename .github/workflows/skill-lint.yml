@@ -1,26 +1,31 @@
-name: skill-lint
+name: forge-checks
 on:
   push:
     branches: [main]
   pull_request:
-    paths:
-      - "skills/**"
-      - "tools/**"
+permissions:
+  contents: read
 jobs:
-  lint:
-    runs-on: ubuntu-latest
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.11', '3.13']
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          python-version: "3.11"
-      - name: Lint all skills
-        run: python3 tools/skill_lint.py
-      - name: Graphify smoke test (offline)
-        run: |
-          mkdir -p /tmp/mini-docs
-          printf '# A\n\nSee [B](b.md).\n' > /tmp/mini-docs/a.md
-          printf '# B\n\nBack to [A](a.md).\n' > /tmp/mini-docs/b.md
-          python3 tools/graphify.py obsidian /tmp/mini-docs --vault /tmp/mini-vault
-          test -f "/tmp/mini-vault/Home.md"
-          grep -rq '\[\[' /tmp/mini-vault
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Validate skill metadata
+        run: python tools/skill_lint.py
+      - name: Check high-risk source patterns (heuristic)
+        run: python tools/security_scan.py
+      - name: Offline behavior and security regressions
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python -m unittest discover -s tests -v

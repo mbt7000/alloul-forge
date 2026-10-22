@@ -1,270 +1,103 @@
-# Alloul Forge ⚒️ — Fable-Style Skills for Claude Code
+# Alloul Forge
 
-**35 professional Agent Skills** that make any Claude Code session work
-like a frontier multi-agent system — plus a Forge layer where your Claude
-develops its own skills from how you actually work, and a personal-growth
-layer that develops *you*.
+**35 portable Agent Skills for Claude, ChatGPT/Codex, and Copilot**, with an offline installer, host-specific exports, and a managed documentation-vault tool.
 
-**العربية: [README.ar.md](README.ar.md)**
+[العربية](README.ar.md) · [Compatibility](docs/COMPATIBILITY.md) · [Security](SECURITY.md) · [Architecture](docs/ARCHITECTURE.md)
 
-An open-source library of professional **Agent Skills** for Claude Code that
-emulates the working style of frontier orchestration models (the
-"Fable 5" approach): decompose a hard problem, fan out many parallel
-agents, adversarially verify every claim, and synthesize one trusted answer.
+The procedures cover engineering, research, knowledge organization, and evidence-based skill improvement. They do not train model weights, grant tools or permissions, connect company accounts, or guarantee better answers. Actual capabilities depend on the host, model, plan, and administrator settings.
 
-> **Disclaimer**: This is a community project. It is **not** affiliated with
-> or endorsed by Anthropic, and it does not contain or reproduce any model.
-> It is a set of prompt-engineering patterns (skills) that teach *any*
-> Claude Code session to work the way advanced multi-agent systems work.
+## Quick start
 
-## The core idea
-
-Frontier agentic systems don't get their power from a single long answer.
-They get it from **structure**:
-
-```
-                 ┌──────────────┐
-                 │  DECOMPOSE   │  split the task into independent slices
-                 └──────┬───────┘
-        ┌───────────────┼───────────────┐
-        ▼               ▼               ▼
-   ┌─────────┐     ┌─────────┐     ┌─────────┐
-   │ agent A │     │ agent B │     │ agent C │   FAN-OUT: parallel workers,
-   └────┬────┘     └────┬────┘     └────┬────┘   each blind to the others
-        ▼               ▼               ▼
-   ┌─────────┐     ┌─────────┐     ┌─────────┐
-   │ skeptic │     │ skeptic │     │ skeptic │   VERIFY: adversarial checkers
-   └────┬────┘     └────┬────┘     └────┬────┘   try to REFUTE each finding
-        └───────────────┼───────────────┘
-                        ▼
-                 ┌──────────────┐
-                 │  SYNTHESIZE  │  merge only what survived verification
-                 └──────────────┘
-```
-
-Four principles, encoded in every skill in this library:
-
-1. **Decompose before you compute.** A task is only as parallel as its plan.
-2. **Independence beats consensus.** Parallel workers must not see each
-   other's output, or they converge on the same mistake.
-3. **Verification is adversarial.** A finding survives only if a dedicated
-   skeptic, prompted to *refute* it, fails to kill it.
-4. **Loop until dry.** Discovery work (bugs, sources, edge cases) ends when
-   *K* consecutive rounds find nothing new — never at an arbitrary count.
-
-## Why skills amplify smaller models
-
-Running the largest model for everything is expensive. There is a
-well-understood, honest alternative: **most of the gap between a good
-model and a frontier one on process-driven tasks is procedure, not raw
-intelligence** — knowing to reproduce before debugging, to profile before
-optimizing, to write the eval before the prompt, to verify adversarially
-before reporting.
-
-Skills encode exactly that procedure. A SKILL.md doesn't change the model;
-it changes what the model *does*: forced phases, explicit stop conditions,
-output contracts, and self-verification steps. In practice this closes a
-large part of the quality gap on structured work (debugging, reviewing,
-migrating, researching) while running on a cheaper model — and it makes
-the largest models better too, because procedure compounds with capability.
-
-That is the design goal of this library: **frontier working style as
-portable, open-source files.**
-
-## Skills included
-
-### Operating layer — the system's front door
-
-| Skill | What it does |
-|---|---|
-| [`conductor`](skills/conductor/SKILL.md) | Takes any task, classifies it, routes it through the right skill chain with contracted handoffs |
-| [`autopilot`](skills/autopilot/SKILL.md) | Continuous safe work loop over the backlog: pick → execute via conductor → verify → commit → update hub → repeat, inside a strict autonomy envelope |
-| [`intent-reader`](skills/intent-reader/SKILL.md) | Reads the human before the task: the goal behind the words, urgency, frustration, expertise — then calibrates depth, autonomy, and tone to match |
-
-### Orchestration core — the parallel patterns
-
-| Skill | What it does |
-|---|---|
-| [`orchestrate`](skills/orchestrate/SKILL.md) | The master pattern: decompose → fan-out → verify → synthesize, for any large task |
-| [`adversarial-verify`](skills/adversarial-verify/SKILL.md) | N independent skeptics per claim; majority-refute kills it |
-| [`judge-panel`](skills/judge-panel/SKILL.md) | Generate N solutions from different angles, score with independent judges, synthesize the winner |
-| [`loop-until-dry`](skills/loop-until-dry/SKILL.md) | Exhaustive discovery loop that stops only after K dry rounds |
-| [`swarm-migrate`](skills/swarm-migrate/SKILL.md) | Large-scale refactors: discover all sites, transform in isolated parallel workers, verify each |
-
-### Research & analysis
-
-| Skill | What it does |
-|---|---|
-| [`deep-research`](skills/deep-research/SKILL.md) | Multi-angle parallel research sweep with adversarial fact-checking and a cited report |
-| [`sci-research`](skills/sci-research/SKILL.md) | Scientific/physics research workflow: hypothesis, parallel literature sweep, methodology critique |
-| [`data-analysis`](skills/data-analysis/SKILL.md) | Data audit before statistics, hypotheses before slicing, uncertainty on every number |
-
-### Engineering discipline
-
-| Skill | What it does |
-|---|---|
-| [`debug-protocol`](skills/debug-protocol/SKILL.md) | Scientific debugging: reproduce → ranked hypotheses → bisect → prove the fix |
-| [`test-architect`](skills/test-architect/SKILL.md) | Risk-ranked test design with boundary tables and mutation self-checks |
-| [`refactor-safely`](skills/refactor-safely/SKILL.md) | Characterization tests first, mechanical green-to-green steps, proven equivalence |
-| [`perf-optimize`](skills/perf-optimize/SKILL.md) | Profile before touching code; fix the top of the profile; prove wins with before/after numbers |
-| [`legacy-explore`](skills/legacy-explore/SKILL.md) | Map an unfamiliar codebase: trace real requests, hunt invariants and traps, before changing anything |
-| [`git-flow`](skills/git-flow/SKILL.md) | Atomic commits scoped by intent, messages from the actual diff, reviewable PRs, messy-tree rescue |
-| [`parallel-review`](skills/parallel-review/SKILL.md) | Code review fanned out by dimension (correctness, security, performance, tests), findings verified before reporting |
-
-### Design & product
-
-| Skill | What it does |
-|---|---|
-| [`spec-first`](skills/spec-first/SKILL.md) | Turn a vague ask into a buildable spec: decided ambiguities, testable acceptance criteria, explicit non-goals |
-| [`api-design`](skills/api-design/SKILL.md) | Contract-first API design: model before endpoints, error/pagination/idempotency decided up front |
-| [`write-docs`](skills/write-docs/SKILL.md) | Docs with a deliberate type (tutorial/how-to/reference/explanation) and every example actually executed |
-
-### Operations & reliability
-
-| Skill | What it does |
-|---|---|
-| [`incident-response`](skills/incident-response/SKILL.md) | Stabilize before diagnosing, one change at a time, timeline file, blameless postmortem |
-| [`ci-doctor`](skills/ci-doctor/SKILL.md) | Classify CI failures (real/flake/infra/drift), reproduce locally, never retry-loop blindly |
-| [`security-audit`](skills/security-audit/SKILL.md) | Defensive audit: threat model, trace untrusted data paths, every finding with a concrete attack path |
-
-### AI engineering
-
-| Skill | What it does |
-|---|---|
-| [`prompt-engineer`](skills/prompt-engineer/SKILL.md) | Eval-first LLM development: graded test cases before the prompt, iterate on measurements not vibes |
-
-### The Forge — Claude that develops itself
-
-The layer that makes this library different from a static skill
-collection: skills that **create, measure, and evolve skills** from your
-own usage. Your Claude doesn't just come pre-skilled — it grows a skill
-library shaped by how you actually work.
-
-| Skill | What it does |
-|---|---|
-| [`skill-forge`](skills/skill-forge/SKILL.md) | Mines your sessions, corrections, and git history for recurring patterns and forges new custom SKILL.md files from them |
-| [`skill-eval`](skills/skill-eval/SKILL.md) | Proves a skill actually helps: blind A/B scenarios with rubric judges → promote / revise / retire |
-| [`claude-tuner`](skills/claude-tuner/SKILL.md) | Compiles a personal Claude setup from evidence: tailored CLAUDE.md, skill loadout, permissions, hooks |
-
-The improvement cycle: `claude-tuner` audits → `skill-forge` generates →
-`skill-eval` proves → `work-hub` tracks the promotion → `knowledge-loop`
-keeps the cadence. Quality is enforced mechanically:
-[`tools/skill_lint.py`](tools/skill_lint.py) validates every skill's
-format and safety in CI (see `.github/workflows/skill-lint.yml`).
-
-### Personal growth — the system grows the person, not just the code
-
-The rarest layer: skills that connect **you** to your work and
-achievements. Goals mapped to real work with drift detection, plans
-backcast from outcomes with kill-criteria, an evidence-based ledger of
-the skills *you* are acquiring (with recall reviews generated from your
-own second brain), and a consent-first personal profile that lives on
-your device and makes every session fit you better.
-
-| Skill | What it does |
-|---|---|
-| [`growth-map`](skills/growth-map/SKILL.md) | Living map from goals → active work → evidence-backed achievements, with drift detection and weekly deltas |
-| [`plan-builder`](skills/plan-builder/SKILL.md) | Backcast a goal into milestones with kill-criteria, risk-first order, and a first slice you can start today |
-| [`learning-tracker`](skills/learning-tracker/SKILL.md) | Tracks the skills the *person* acquires — behavioral levels, evidence-only promotions, recall reviews from their vault |
-| [`companion-profile`](skills/companion-profile/SKILL.md) | Consent-first personal model in a file you own (default `~/.claude/profile.md`, outside any repo): provenance-tagged requirements sessions read once wired into CLAUDE.md |
-
-### Knowledge & second brain
-
-| Skill | What it does |
-|---|---|
-| [`graphify`](skills/graphify/SKILL.md) | Turn any documentation corpus into a wikilinked Obsidian vault (ships with a real CLI: [`tools/graphify.py`](tools/graphify.py)) |
-| [`knowledge-loop`](skills/knowledge-loop/SKILL.md) | Recurring capture → organize → distill → express loop that keeps the vault alive |
-| [`work-hub`](skills/work-hub/SKILL.md) | Single-pane work dashboard in git: every project, task, and decision visible from one file |
-
-**Try it now** — build a second brain from the official Claude Code docs
-in one command (no dependencies, stdlib Python):
+Python 3.11+; no third-party Python packages, install hooks, API keys, telemetry, or model calls are required by these tools. Review a pinned revision before installing. Run from the repository root:
 
 ```bash
-python3 tools/graphify.py obsidian https://code.claude.com/docs/llms.txt --vault ./claude-code-vault
+python3 tools/skill_lint.py
+python3 tools/security_scan.py
+python3 -m unittest discover -s tests -v
+python3 tools/forge.py list
 ```
 
-Open the folder in Obsidian and check the graph view. A 12-page sample of
-the result is committed at
-[`examples/claude-code-vault-sample/`](examples/claude-code-vault-sample/)
-(content © Anthropic, see its ATTRIBUTION.md).
-
-## Installation
-
-Skills live in a `skills/<name>/SKILL.md` layout, compatible with Claude Code.
-
-**Per-project** (recommended):
+Install into an explicitly chosen project. Start with a few skills instead of loading everything:
 
 ```bash
-git clone https://github.com/mbt7000/alloul-forge
-cp -r alloul-forge/skills/* your-project/.claude/skills/
+python3 tools/forge.py install --target codex --destination ../my-project --skill debug-protocol --skill graphify --dry-run
+python3 tools/forge.py install --target codex --destination ../my-project --skill debug-protocol --skill graphify
 ```
 
-**Global** (available in every project):
+Other native coding hosts:
 
 ```bash
-cp -r alloul-forge/skills/* ~/.claude/skills/
+python3 tools/forge.py install --target claude --destination ../my-project
+python3 tools/forge.py install --target copilot --destination ../my-project
+python3 tools/forge.py install --target all --destination ../my-project
 ```
 
-Or run the helper:
+`all` creates the Claude, Codex, and GitHub Copilot layouts. `universal` creates `.agents/skills`, for hosts that document support for that path. `--scope user` treats the explicit destination as a user-home-style root; it does not discover or modify any account settings. The legacy `install.sh` remains a Claude-specific wrapper. Windows: use `python` instead of `python3` if appropriate; no shell wrapper is needed.
+
+The installer copies each complete skill and its needed helpers. It never executes imported resources or modifies host permission files. An unowned or edited destination file causes a conflict, rather than silent replacement. Owned updates are backed up; files omitted by later selections are retained and reported, not deleted.
+
+## ChatGPT and Copilot Studio
 
 ```bash
-./install.sh            # installs into ./.claude/skills of the current repo
-./install.sh --global   # installs into ~/.claude/skills
+python3 tools/forge.py export --target chatgpt --output ../forge-chatgpt
+python3 tools/forge.py verify ../forge-chatgpt
+python3 tools/forge.py export --target copilot-studio --output ../forge-studio --skill work-hub --skill plan-builder
+python3 tools/forge.py export --target portable --output ../forge-portable
 ```
 
-Then in any Claude Code session:
+The ChatGPT export is a **skills-only plugin source package** with `.codex-plugin/plugin.json`. It contains no MCP server, connector, hooks, or credentials. Installation/submission uses the host's supported workflow; the exporter does not install into an account, submit to a directory, or prove acceptance.
 
-```
-/orchestrate refactor the payment module for idempotency
-/deep-research what are the leading approaches to room-temperature superconductivity?
-/parallel-review
-```
+The Studio export contains skill directories plus individual instruction files and a controller under 8,000 characters. Use the Skills UI when your agent's harness supports it. For other instruction-based agents, use selected procedures within the host's limits. Uploading instructions does not create tools, scheduling, persistent memory, or permissions.
 
-## How the skills achieve parallelism
+See the [compatibility matrix and official sources](docs/COMPATIBILITY.md) before choosing an adapter. Other AI vendors can use the portable procedures if their host supports Agent Skills or explicit instructions; there is no claim of universal native execution.
 
-Claude Code exposes two native mechanisms these skills build on:
+## Included skills
 
-- **The `Agent` tool** — spawn subagents; multiple calls issued together run
-  concurrently. Skills instruct the model to batch independent spawns.
-- **The `Workflow` tool** (where available) — a deterministic JavaScript
-  orchestration script with `parallel()`, `pipeline()`, and per-agent
-  structured output schemas. Skills include ready-made workflow templates.
+| Group | Skills |
+|---|---|
+| Task intake and bounded work | `conductor`, `autopilot`, `intent-reader` |
+| Orchestration and review | `orchestrate`, `adversarial-verify`, `judge-panel`, `loop-until-dry`, `swarm-migrate` |
+| Research and analysis | `deep-research`, `sci-research`, `data-analysis` |
+| Engineering | `debug-protocol`, `test-architect`, `refactor-safely`, `perf-optimize`, `legacy-explore`, `git-flow`, `parallel-review` |
+| Product and contracts | `spec-first`, `api-design`, `write-docs` |
+| Reliability and security | `incident-response`, `ci-doctor`, `security-audit` |
+| AI development | `prompt-engineer` |
+| Skill improvement | `skill-forge`, `skill-eval`, `assistant-tuner` |
+| Goals and learning | `growth-map`, `plan-builder`, `learning-tracker`, `companion-profile` |
+| Knowledge | `graphify`, `knowledge-loop`, `work-hub` |
 
-Each SKILL.md degrades gracefully: if only the `Agent` tool exists, the skill
-uses batched subagents; if neither exists, it runs the same phases
-sequentially in one context — the *structure* (decompose/verify/synthesize)
-is preserved either way.
+`assistant-tuner` replaces `claude-tuner`. Existing installations are not silently deleted: review and remove the old skill through your host if you migrate. Personal profiles default to `~/.alloul-forge/profile.md`, outside a repository; the installer does not create one.
 
-## Repository layout
+Every skill contains a host/safety contract. Subagents are used only when authorized and supported; sequential fallback is not described as blind or independent. Skill evaluation requires clean separate contexts, equal budgets, and outcome-oriented rubrics. The historical debug-protocol eval is a recorded example, not a cross-provider benchmark or proof for all 35 skills.
 
-```
-skills/                 the skills (copy these into .claude/skills/)
-  orchestrate/SKILL.md
-  deep-research/SKILL.md
-  ...
-tools/
-  graphify.py           docs → Obsidian vault CLI (stdlib only)
-  skill_lint.py         quality gate for SKILL.md files (runs in CI)
-examples/
-  claude-code-vault-sample/   sample vault built from the Claude Code docs
-docs/
-  ARCHITECTURE.md       deep dive: why these patterns work
-install.sh              installer
-README.ar.md            Arabic documentation
-LICENSE                 MIT
+## A managed second brain
+
+Local Markdown works offline:
+
+```bash
+python3 tools/graphify.py obsidian ./my-docs --vault ../my-vault --dry-run
+python3 tools/graphify.py obsidian ./my-docs --vault ../my-vault
 ```
 
-## Contributing
+A trusted remote Markdown index requires explicit network access:
 
-PRs welcome. A good skill submission:
+```bash
+python3 tools/graphify.py list https://code.claude.com/docs/llms.txt --allow-network
+python3 tools/graphify.py obsidian https://code.claude.com/docs/llms.txt --vault ../docs-vault --allow-network
+```
 
-1. Follows the `skills/<name>/SKILL.md` format with YAML frontmatter
-   (`name`, `description`).
-2. Encodes a *structural* pattern (how agents are arranged), not just a
-   prompt style.
-3. States its stop condition explicitly — every loop must terminate.
-4. Degrades gracefully when subagent tools are unavailable.
+Only the index hostname is initially allowed. Add another trusted hostname with `--allow-host HOST` if needed. Private/reserved addresses, file URLs, credentials in URLs, unsafe redirects and HTTPS downgrades are blocked. DNS results are checked and the connection uses a checked numeric address with hostname TLS validation. Proxy environment variables are intentionally not used. Plain HTTP requires the separate `--allow-http` flag.
 
-## License
+Defaults: 200 pages, 2 MiB per page, 32 MiB total response bytes, 300 requests and a 10-second socket timeout. `--include REGEX` narrows a corpus; `--limit N` changes the page cap, up to 2,000. Exceeding a cap fails explicitly; pages are not silently dropped. Only Markdown/plain text is imported, not an arbitrary HTML crawler.
 
-MIT — see [LICENSE](LICENSE).
+The output uses stable source-derived names, source-relative links, heading anchors, MOCs, and `Home.md`. `.forge-vault.json` records generated-file ownership hashes. Conflicts with human files or edits stop preparation. Failed downloads do not replace good content. Updated generated files have backups under `.forge-backups/`. Atomic writes are per file, not one transaction across a whole vault; see recovery limits in [SECURITY.md](SECURITY.md).
+
+For an old unmanaged vault, generate a new directory and review migration. Do not overwrite the old vault or forge an ownership manifest. Source content remains untrusted data and may contain prompt injection or private information; review it before sharing or giving it to an agent.
+
+## Validation and limits
+
+CI runs metadata checks, heuristic security checks, and offline behavior/security regression tests on Linux and Windows/Python versions configured in the workflow. These are software tests, not live Claude/ChatGPT/Copilot acceptance tests. No model calls or customer data are used.
+
+`forge.py verify` detects modified, missing, and unexpected files inside managed skill directories relative to a local hash manifest. A hash manifest is **not** a trusted signature. Static checks and passing tests do not certify that code is malware-free. Host authorization, sandboxing, DLP, data retention and company approvals remain required where applicable.
+
+[Contributions](CONTRIBUTING.md) · MIT license for project code; the existing third-party documentation sample has its own [attribution](examples/claude-code-vault-sample/ATTRIBUTION.md).
