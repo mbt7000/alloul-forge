@@ -13,8 +13,12 @@ Contributions welcome — skills, tools, translations, and eval sets.
    tools are missing.
 3. Encode a *structural* pattern (how work is arranged and verified),
    with real decision rules — not just a prompt style.
-4. Lint locally: `python3 tools/skill_lint.py skills/<name>` — CI runs
-   the same check on every PR and errors block merge.
+4. Validate locally: `python3 tools/skill_lint.py skills/<name>`,
+   `python3 tools/security_scan.py`, and `python3 -m unittest discover -s tests -v`.
+   CI reports failures; repository owners must configure required checks
+   if they want merge enforcement. The house frontmatter accepts only
+   unique single-line name/description string fields; quote values containing
+   YAML-special syntax. Unsupported YAML forms are rejected.
 5. Strongly encouraged: an eval set at `skills/<name>/eval.md`
    (scenarios + rubrics, see the `skill-eval` skill) proving the skill
    beats baseline.
@@ -27,3 +31,12 @@ Contributions welcome — skills, tools, translations, and eval sets.
 - English body text; translations of READMEs and skills are welcome as
   parallel files (e.g. `README.ar.md` pattern).
 - MIT licensed — by contributing you agree your contribution is too.
+- Keep procedures provider-neutral. Describe a host-specific capability as
+  conditional; never imply that a skill grants tools, account access, approval,
+  scheduling, independent contexts, or persistent memory.
+- Include each required resource in an install/export test. Never add automatic
+  downloads, package installation, telemetry, credential collection, eval/exec,
+  unsafe deserialization, or shell-based execution of imported content.
+- Changes to write/import/installer behavior require behavioral regression
+  tests with disposable synthetic data. Static checks are not a malware
+  certificate; state their limits and keep live-host evaluation separate.

@@ -15,6 +15,8 @@ import pathlib
 import re
 import sys
 
+from forge_common import ForgeError, parse_frontmatter, read_regular
+
 TRIGGER_RE = re.compile(r"\bUse (when|for|before|after|during)\b", re.IGNORECASE)
 NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 MAX_DESCRIPTION = 1024
@@ -22,32 +24,17 @@ MAX_BODY_LINES = 200
 MIN_BODY_LINES = 15
 
 
-def parse_frontmatter(text: str) -> tuple[dict[str, str], str] | None:
-    if not text.startswith("---\n"):
-        return None
-    end = text.find("\n---\n", 4)
-    if end == -1:
-        return None
-    fields: dict[str, str] = {}
-    key = None
-    for line in text[4:end].splitlines():
-        m = re.match(r"^(\w[\w-]*):\s*(.*)$", line)
-        if m:
-            key = m.group(1)
-            fields[key] = m.group(2).strip()
-        elif key and line.startswith((" ", "\t")):
-            fields[key] += " " + line.strip()
-    return fields, text[end + 5 :]
-
-
 def lint_skill(path: pathlib.Path) -> tuple[list[str], list[str]]:
     errors: list[str] = []
     warnings: list[str] = []
-    text = path.read_text(encoding="utf-8")
+    try:
+        text = read_regular(path).decode("utf-8")
+    except (OSError, UnicodeError, ForgeError):
+        return ["skill must be a bounded UTF-8 regular file without symlinks"], []
 
     parsed = parse_frontmatter(text)
     if parsed is None:
-        return ["missing or malformed YAML frontmatter (--- ... ---)"], []
+        return ["invalid house frontmatter: use unique single-line name/description strings only"], []
     fields, body = parsed
 
     name = fields.get("name", "")
@@ -59,6 +46,10 @@ def lint_skill(path: pathlib.Path) -> tuple[list[str], list[str]]:
         errors.append(f"name '{name}' is not kebab-case")
     elif name != path.parent.name:
         errors.append(f"name '{name}' != directory '{path.parent.name}'")
+    if len(name) > 64:
+        errors.append("name exceeds 64 characters")
+    if re.search(r"<[^>]*>", name + desc):
+        errors.append("XML/HTML tags are not accepted in frontmatter")
 
     if not desc:
         errors.append("frontmatter missing 'description'")
@@ -80,14 +71,14 @@ def lint_skill(path: pathlib.Path) -> tuple[list[str], list[str]]:
     lower = body.lower()
     if not re.search(r"\bstop condition|\brules\b|\bhard cap|maximum\b|\bnever\b", lower):
         warnings.append("no visible stop conditions or rules — every loop must terminate")
-    if "fallback" not in lower and "sequential" not in lower:
+    if re.search(r"\bsubagents?\b|\bspawn\b", lower) and "fallback" not in lower and "sequential" not in lower:
         warnings.append("no fallback for missing subagent tools — skills should degrade gracefully")
 
     for secret_pat, label in [
-        (r"(?i)(api[_-]?key|secret|token)\s*[:=]\s*['\"][A-Za-z0-9_\-]{16,}", "possible hardcoded credential"),
+        (r"(?i)(api[_-]?key|secret|token)\s*[:=]\s*['\"]?[A-Za-z0-9_\-]{16,}", "possible hardcoded credential (value redacted)"),
         (r"https?://[a-z0-9.-]*\.internal\b", "internal hostname"),
     ]:
-        if re.search(secret_pat, body):
+        if re.search(secret_pat, text):
             errors.append(label)
 
     return errors, warnings

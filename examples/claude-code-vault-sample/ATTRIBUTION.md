@@ -10,7 +10,7 @@ carries its `source:` URL in its frontmatter. To build the full, up-to-date
 vault yourself (165+ pages), run:
 
 ```bash
-python3 tools/graphify.py obsidian https://code.claude.com/docs/llms.txt --vault ./claude-code-vault
+python3 tools/graphify.py obsidian https://code.claude.com/docs/llms.txt --vault ../claude-code-vault --allow-network
 ```
 
 Then open the folder in Obsidian and check the graph view.

@@ -1,31 +1,16 @@
 #!/usr/bin/env sh
-# Install the skills into a Claude Code skills directory.
+# Backward-compatible Claude installer. Use tools/forge.py for other hosts.
 #
 #   ./install.sh            -> ./.claude/skills of the current directory
 #   ./install.sh --global   -> ~/.claude/skills
 #   ./install.sh <path>     -> <path>/.claude/skills
 set -eu
 
-SRC="$(cd "$(dirname "$0")" && pwd)/skills"
+FORGE_ROOT="$(cd "$(dirname "$0")" && pwd)"
 
 case "${1:-}" in
-  --global) DEST="$HOME/.claude/skills" ;;
-  "")       DEST="$(pwd)/.claude/skills" ;;
-  *)        DEST="$1/.claude/skills" ;;
+  --global) exec python3 "$FORGE_ROOT/tools/forge.py" install --target claude --scope user --destination "$HOME" ;;
+  "")       exec python3 "$FORGE_ROOT/tools/forge.py" install --target claude --destination "$(pwd)" ;;
+  --*)      echo "Use python3 tools/forge.py --help for platform options" >&2; exit 2 ;;
+  *)        exec python3 "$FORGE_ROOT/tools/forge.py" install --target claude --destination "$1" ;;
 esac
-
-[ -d "$SRC" ] || { echo "error: skills/ not found next to install.sh" >&2; exit 1; }
-
-mkdir -p "$DEST"
-installed=0
-for dir in "$SRC"/*/; do
-  name="$(basename "$dir")"
-  [ -f "$dir/SKILL.md" ] || continue
-  mkdir -p "$DEST/$name"
-  cp "$dir/SKILL.md" "$DEST/$name/SKILL.md"
-  echo "  installed: $name"
-  installed=$((installed + 1))
-done
-
-echo "done: $installed skills -> $DEST"
-echo "try:  /orchestrate <your big task>"
