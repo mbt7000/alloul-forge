@@ -405,6 +405,23 @@ class MetadataAndSecurity(TemporaryTest):
         desc = json.dumps("Use when organizing Arabic مهام: safely.", ensure_ascii=False)
         self.assertEqual(skill_lint.lint_skill(self.valid_skill(desc))[0], [])
 
+    def test_windows_crlf_metadata_is_accepted(self):
+        path = self.valid_skill()
+        path.write_bytes(path.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", b"\r\n"))
+        self.assertEqual(skill_lint.lint_skill(path)[0], [])
+        parsed = common.parse_frontmatter(path.read_bytes().decode("utf-8"))
+        self.assertEqual(parsed[0]["name"], "probe")
+        self.assertNotIn("\r", parsed[1])
+
+    def test_windows_crlf_skill_can_be_installed(self):
+        path = self.valid_skill()
+        source = self.root / "source/skills/probe"; source.mkdir(parents=True)
+        raw = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", b"\r\n")
+        (source / "SKILL.md").write_bytes(raw)
+        with mock.patch.object(forge, "ROOT", self.root / "source"):
+            forge.install("codex", self.root / "installed", ["probe"])
+        self.assertEqual(forge.verify(self.root / "installed", ".forge-install.json")["findings"], [])
+
     def test_unquoted_credential_signal_detected_without_value(self):
         value = "x" * 32
         text = "API_KEY=" + value

@@ -99,6 +99,7 @@ def parse_frontmatter(text: str) -> tuple[dict[str, str], str] | None:
     YAML collections, tags, anchors, multiline scalars and unknown fields are
     rejected instead of being approximately interpreted. No YAML dependency.
     """
+    text = text.replace("\r\n", "\n")
     if not text.startswith("---\n"):
         return None
     end = text.find("\n---\n", 4)
